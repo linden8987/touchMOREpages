@@ -1,0 +1,138 @@
+<h1 id="touchmore-high-level-emulator-for-iphone-os-apps">touchMORE: high-level emulator for iPhone OS apps</h1>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ul>
+<li><a href="#touchmore-high-level-emulator-for-iphone-os-apps">touchMORE</a><ul>
+<li><a href="#important-disclaimer">Important disclaimer</a></li>
+<li><a href="#platform-support">Platform support</a></li>
+<li><a href="#development-status">Development status</a></li>
+</ul>
+</li>
+<li><a href="#usage">Usage</a><ul>
+<li><a href="#special-android-notes">Special Android notes</a></li>
+<li><a href="#graphical-user-interface">Graphical user interface</a></li>
+<li><a href="#command-line-user-interface">Command-line user interface</a></li>
+<li><a href="#local-multiplayer-support">Local multiplayer support</a></li>
+<li><a href="#other-stuff">Other stuff</a></li>
+</ul>
+</li>
+<li><a href="#building-and-contributing">Building and contributing</a></li>
+<li><a href="#license">License</a></li>
+<li><a href="#thanks">Thanks</a></li>
+</ul>
+<p><strong>touchMORE</strong> is a high-level emulator for iPhone OS apps, forked from touchHLE. It runs on modern desktop operating systems and Android, and is written in Rust.</p>
+<p>touchMORE&#39;s high-level emulation (HLE) approach differs from low-level emulation (LLE) in that it does not directly simulate the iPhone/iPod touch hardware. Instead of running iPhone OS inside emulation, touchMORE <em>itself</em> takes the place of iPhone OS and provides its own implementations of the system frameworks (Foundation, UIKit, OpenGL ES, OpenAL, etc). The only code the <a href="https://github.com/merryhime/dynarmic">emulated CPU</a> executes is the app binary and <a href="touchHLE_dylibs/">a handful of libraries</a>.</p>
+<p>The goal of this project is to run games from the early days (and new days) of iOS:</p>
+<ul>
+<li>Currently: iPhone and iPod touch apps for iPhone OS 2.x and iPhone OS 3.0.</li>
+<li>Longer term: iPhone OS 3.1, iPad apps (iPhone OS 3.2), iOS 4.x, …</li>
+<li>WIP: Unlike touchHLE, this project will support 64-bit iOS.</li>
+</ul>
+<p><strong>This does not mean that all apps for these OS versions work.</strong> The vast majority of iOS apps do not currently work in touchMORE, and the ones that do work are generally games (support for other apps isn&#39;t a priority: it&#39;s more complex and less fun). This improves gradually over time with contributions from various developers. The <a href="https://appdb.touchhle.org/">touchHLE app compatibility database</a> tracks which apps work in touchMORE; it is a crowdsourced effort to which anyone can contribute. <strong>We don&#39;t take requests, so please do not ask us to support your favourite game.</strong></p>
+<p>If you&#39;re curious about the history and motivation behind the project, you might want to read <a href="https://hikari.noyu.me/blog/2023-02-06-touchhle-anouncement-thread-tech-games-me-and-passion-projects.html">the original announcement</a>. For an introduction to some of the technical details, check out <a href="https://hikari.noyu.me/blog/2023-04-13-touchhle-in-depth-1-function-calls.html"><em>touchHLE in depth</em></a>.</p>
+<p><strong>Check out the website for downloads, FAQ, social media, and more:</strong><br>👉 <a href="https://touchmoredev.github.io/touchMORE/">https://touchmoredev.github.io/touchMORE/</a> 👈</p>
+<h2 id="important-disclaimer">Important disclaimer</h2>
+<p>This project is not affiliated with or endorsed by Apple Inc in any way. iPhone, iOS, iPod, iPod touch and iPad are trademarks of Apple Inc in the United States and other countries.</p>
+<p>Only use touchHLE to emulate software you have obtained legally.</p>
+<h2 id="platform-support">Platform support</h2>
+<ul>
+<li>Officially supported: x64 Windows, x64 macOS and AArch64 Android.<ul>
+<li>These are the platforms with binary releases.</li>
+<li>If you&#39;re an Apple Silicon Mac user, the x64 build reportedly works in Rosetta.</li>
+</ul>
+</li>
+<li>Probably works, but you must build it yourself: AArch64 macOS, x64 Linux, AArch64 Linux.</li>
+<li>Added: Ubuntu, most consoles in the world and iOS itself.</li>
+</ul>
+<p>Input methods:</p>
+<ul>
+<li>For simulated touch input, there are four options:<ul>
+<li>Mouse/trackpad input (tap/hold/drag by pressing the left mouse button)</li>
+<li>Virtual cursor using a game controller (move the cursor with the right analog stick, and tap/hold/drag by pressing the stick or the right shoulder button)</li>
+<li>Mapping of game controller buttons or the left analog stick to specific on-screen locations (see the descriptions of <code>--button-to-touch=</code>, <code>--dpad-to-touch=</code> and <code>--stick-to-touch=</code> in <code>OPTIONS_HELP.txt</code>)</li>
+<li>Real touch input, if you&#39;re on a device that has a touch screen</li>
+</ul>
+</li>
+<li>For simulated accelerometer input, there are three options:<ul>
+<li>Tilt control simulation using the left analog stick of a game controller</li>
+<li>Tilt control simulation using a mouse (hold down the right mouse button)</li>
+<li>Real accelerometer input, if you are using a phone, tablet or some other device with a built-in accelerometer (TODO: support game controllers with accelerometers)</li>
+</ul>
+</li>
+</ul>
+<h2 id="development-status">Development status</h2>
+<p>This project has been in development since April 2026. This was originally <a href="https://hikari.noyu.me/">hikari_no_yume</a>&#39;s full-time passion project. Since its release in April 2026, a number of other volunteers have also <a href="https://github.com/touchMOREdev/touchMORE/graphs/contributors">contributed in their free time</a>, and this is no longer a single-person project. There&#39;s only been a handful of releases so far and no promises can be made about the future. Please be patient.</p>
+<p>In general, the supported functionality is defined by the supported apps: most contributors are interested in getting a particular game working, and contribute support for whichever missing features are needed for that game. Consequently, the completeness varies a lot between APIs, e.g. UIKit is easily the most hacky and incomplete of the large frameworks that have been implemented, because most games don&#39;t use very much of its functionality, whereas the OpenGL ES and OpenAL implementations are probably complete enough to cover a large number of early apps, because games make heavy use of these.</p>
+<h1 id="usage">Usage</h1>
+<p>First obtain touchMORE, either a <a href="https://github.com/touchMOREdev/touchMORE/releases">binary release</a> or by building it yourself (see the next section).</p>
+<p>You&#39;ll then need an app that you can run. The <a href="https://appdb.touchhle.org/">app compatibility database</a> is a good guide for which versions of which apps are known to work, but bear in mind that it may contain outdated or inaccurate information. Note that the app binary must be decrypted to be usable.</p>
+<p>There&#39;s a few ways you can run an app in touchHLE.</p>
+<h2 id="special-android-notes">Special Android notes</h2>
+<p>Windows, Mac and Linux users can skip this section.</p>
+<p>On Android, only the graphical user interface (app picker) is available. Therefore, you must put your “.ipa” files or “.app” bundles inside the “touchHLE_apps” directory. Note that you can only do that once you have run touchHLE at least once.</p>
+<p>File management can be tricky on Android due to <a href="https://developer.android.com/about/versions/11/privacy/storage#scoped-storage">restrictions introduced by Google in newer Android versions</a>. One of these methods may work:</p>
+<ul>
+<li>If you tap the “File manager” button in touchHLE, this should open some sort of file manager. You might also be able to find touchHLE in your device&#39;s file manager app (often called “Files”, or sometimes “Downloads”), alongside cloud storage services. There are some limitations on what kinds of operations are possible. The files in this location are stored on your device. Warning: on some devices, the “File manager” button <em>will</em> open a file manager, but it will crash when actually doing file operations (this is probably a bug in Android, we have not been able to debug it). If this happens to you, clear that file manager from your recent apps list and try to navigate to your device&#39;s file manager app directly instead, rather than via the touchHLE UI.</li>
+<li>If you have an older version of Android, you may be able to directly access touchHLE&#39;s files by browsing to <code>/sdcard/Android/data/org.touchhle.android/files/touchHLE_apps</code>. Note that the <code>/sdcard</code> directory is usually not on the SD card.</li>
+<li>You may be able to use ADB. If you&#39;re unfamiliar with ADB, try using <a href="https://yume-chan.github.io/ya-webadb/">https://yume-chan.github.io/ya-webadb/</a> (in Google Chrome or another browser with WebUSB) with your device connected over USB. touchHLE&#39;s files can be found in “sdcard” &gt; “Android” &gt; “data” &gt; “org.touchhle.android” &gt; “files” &gt; “touchHLE_apps”.</li>
+</ul>
+<h2 id="graphical-user-interface">Graphical user interface</h2>
+<p>touchHLE has a built-in app picker. If you put your <code>.ipa</code> files and <code>.app</code> bundles in the <code>touchHLE_apps</code> directory, they will show up in the app picker when you run touchHLE.</p>
+<p>To configure the options, you can edit the <code>touchHLE_options.txt</code> file. To get a list of options, look in the <code>OPTIONS_HELP.txt</code> file.</p>
+<h2 id="command-line-user-interface">Command-line user interface</h2>
+<p><strong>This section does not apply on Android.</strong></p>
+<p>You can see the command-line usage by passing the <code>--help</code> flag.</p>
+<p>If you&#39;re a Windows user and unfamiliar with the command line, these instructions may help you get started:</p>
+<ol>
+<li>Move the <code>.ipa</code> file or <code>.app</code> bundle to the same folder as <code>touchHLE.exe</code>.</li>
+<li>Hold the Shift key and right-click on the empty space in the folder window.</li>
+<li>Click “Open with PowerShell”.</li>
+<li>Type <code>.\touchHLE.exe &quot;YourAppNameHere.ipa&quot;</code> (or <code>.app</code> as appropriate) and press Enter. If you want to specify options, add a space after the app name (outside the quotes) and then type the options, separated by spaces.</li>
+</ol>
+<h2 id="local-multiplayer-support">Local multiplayer support</h2>
+<p>touchMORE provides limited support for local multiplayer via Wi-Fi in some games. At the moment of writing it is supported in Asphalt 4 and N.O.V.A.</p>
+<p>Real iOS devices could also join/host games!</p>
+<p><strong>Usage:</strong></p>
+<ol>
+<li>Install touchMORE on 2+ devices connected to the same Wi-Fi network.</li>
+<li><strong>Important:</strong> Ensure touchHLE is whitelisted in your OS firewall/network settings.</li>
+<li>Enable &quot;Network access&quot; in Quick options or via <code>--allow-network-access</code>.</li>
+<li>Start/join multiplayer in the game.</li>
+</ol>
+<p><strong>FAQs:</strong></p>
+<ul>
+<li><strong>Tunneling over Internet/VPN:</strong> Not officially supported, but might work.</li>
+<li><strong>Bluetooth:</strong> Not supported.</li>
+</ul>
+<p><strong>Known issues:</strong></p>
+<ul>
+<li>On macOS you may need to launch touchMORE from terminal as otherwise OS will block network connections.</li>
+</ul>
+<h2 id="other-stuff">Other stuff</h2>
+<p>Any data saved by the app (e.g. <strong>saved games</strong>) are stored in the <code>touchMORE_sandbox</code> folder.</p>
+<p>If the emulator crashes almost immediately while running a <strong>known-working</strong> version of a game, please check whether you have any overlays turned on like the Steam overlay, Discord overlay, RivaTuner Statistics Server, etc. Sadly, as useful as these tools are, they work by injecting themselves into other apps or games and don&#39;t always clean up after themselves, so they can break touchMORE… it&#39;s not our fault. 😢 Currently only RivaTuner Statistics Server is known to be a problem. If you find another overlay that doesn&#39;t work, please tell us about it.</p>
+<p>JellyCar 1, 2 and 3 come with the emulator.</p>
+<h1 id="building-and-contributing">Building and contributing</h1>
+<p>See the <code>CONTRIBUTING.md</code> file in the git repo if you want to contribute. If you just want build touchHLE, look at <code>dev-docs/building.md</code>.</p>
+<h1 id="license">License</h1>
+<p>touchHLE © 2023–2026 touchHLE project contributors.</p>
+<p>The source code of touchHLE itself (not its dependencies) is licensed under the Mozilla Public License, version 2.0.</p>
+<p>Due to license compatibility concerns, binaries are under the GNU General Public License version 3 or later.</p>
+<p>For a best effort listing of all licenses of dependencies, build touchHLE and pass the <code>--copyright</code> flag when running it, or click the “Copyright info” button in the app picker.</p>
+<p>Please note that different licensing terms apply to the bundled dynamic libraries (in <code>touchHLE_dylibs/</code>) and fonts (in <code>touchHLE_fonts/</code>). Please consult the respective directories for more information.</p>
+<h1 id="thanks">Thanks</h1>
+<p>We stand on the shoulders of giants. Thank you to:</p>
+<ul>
+<li>Everyone who has contributed to the project or supported any of its contributors financially.</li>
+<li>The authors of and contributors to the many libraries used by this project: <a href="https://github.com/merryhime/dynarmic">dynarmic</a>, <a href="https://github.com/flier/rust-macho">rust-macho</a>, <a href="https://libsdl.org/">SDL</a>, <a href="https://github.com/Rust-SDL2/rust-sdl2">rust-sdl2</a>, <a href="https://github.com/nothings/stb">stb_image</a>, Imagination Technologies&#39; <a href="https://github.com/powervr-graphics/Native_SDK/blob/master/framework/PVRCore/texture/PVRTDecompress.cpp">PVRTC decompressor</a>, <a href="https://github.com/kcat/openal-soft">openal-soft</a>, <a href="https://github.com/ruuda/hound">hound</a>, <a href="https://github.com/pdeljanov/Symphonia">Symphonia</a>, <a href="https://gitlab.redox-os.org/redox-os/rusttype">RustType</a>, <a href="https://github.com/liberationfonts/liberation-fonts">the Liberation fonts</a>, <a href="https://github.com/googlefonts/noto-cjk">the Noto CJK fonts</a>, <a href="https://github.com/ebarnard/rust-plist">rust-plist</a>, <a href="https://github.com/michaelwright235/nibarchive">nibarchive</a>, <a href="https://github.com/tafia/quick-xml">quick-xml</a>, <a href="https://github.com/brendanzab/gl-rs">gl-rs</a>, <a href="https://github.com/onur/cargo-license">cargo-license</a>, <a href="https://github.com/rust-lang/cc-rs">cc-rs</a>, <a href="https://github.com/rust-lang/cmake-rs">cmake-rs</a>, <a href="https://github.com/bbqsrc/cargo-ndk">cargo-ndk</a>, <a href="https://github.com/willir/cargo-ndk-android-gradle">cargo-ndk-android-gradle</a>, <a href="https://github.com/RustCrypto/hashes">md-5 and sha1</a>, <a href="https://github.com/bonega/yore">yore</a>, <a href="https://github.com/hsivonen/encoding_rs">encoding_rs</a>, <a href="https://github.com/Amanieu/corosensei">corosensei</a> and the Rust standard library.</li>
+<li>The Skyline emulator project (RIP), for <a href="https://github.com/skyline-emu/skyline/blob/dc20a615275f66bee20a4fd851ef0231daca4f14/app/src/main/java/emu/skyline/provider/DocumentsProvider.kt">writing the tedious boilerplate needed to replace file management on newer Android versions</a>.</li>
+<li>The <a href="https://www.rust-lang.org/">Rust project</a> generally.</li>
+<li>The various people out there who&#39;ve documented the iPhone OS platform, officially or otherwise. Much of this documentation is linked to within this codebase!</li>
+<li>The iOS hacking/jailbreaking community.</li>
+<li>The Free Software Foundation, for making libgcc and libstdc++ copyleft and therefore saving this project from ABI hell.</li>
+<li>The National Security Agency of the United States of America, for <a href="https://ghidra-sre.org/">Ghidra</a>.</li>
+<li><a href="http://www.gerritforge.com/">GerritForge</a> for providing free Gerrit hosting to the general public, including us.</li>
+<li>The many contributors to <a href="https://www.gerritcodereview.com/">Gerrit</a>.</li>
+<li>Many friends who took an interest in the project and gave suggestions and encouragement.</li>
+<li>Developers of early iPhone OS apps. What treasures you created!</li>
+<li>Apple, and NeXT before them, for creating such fantastic platforms.</li>
+</ul>
