@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>touchMORE Documentation</title>
+<title>touchMORE</title>
 <style>
-  /* --- Your Space & Bounce CSS --- */
+  /* --- Global Reset & Background --- */
   body, html {
     margin: 0;
     padding: 0;
@@ -13,11 +13,14 @@
     color: #f5f5f7;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     scroll-behavior: smooth;
+    /* This prevents the white 'void' during overscroll on most browsers */
+    overscroll-behavior: none; 
   }
 
+  /* The stars now stay fixed so they never 'run out' when scrolling */
   .space-container {
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     position: fixed; 
     top: 0;
     left: 0;
@@ -29,11 +32,13 @@
     animation: starFly 10s linear infinite;
   }
 
+  /* The DVD image stays fixed in the viewport while you scroll the text */
   .dvd-image {
     width: 150px; 
-    position: fixed; /* Fixed so it keeps bouncing while you scroll */
+    position: fixed; 
     z-index: -1;
-    opacity: 0.6; /* Slight transparency so text is readable over it */
+    opacity: 0.5;
+    pointer-events: none; /* Allows you to click links behind the image */
     animation: 
       bounceX 5.4s linear infinite alternate, 
       bounceY 3.7s linear infinite alternate;
@@ -54,75 +59,61 @@
     to { top: calc(100vh - 100px); }
   }
 
-  /* --- Documentation Layout --- */
+  /* --- Content Styling --- */
   .content-overlay {
     position: relative;
     z-index: 10;
     max-width: 800px;
     margin: 0 auto;
-    padding: 40px 20px;
-    background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(8px);
+    padding: 60px 20px;
+    /* Translucent background for readability */
+    background: rgba(0, 0, 0, 0.7); 
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     min-height: 100vh;
-    box-shadow: 0 0 50px rgba(0,0,0,1);
   }
 
-  /* --- Navigation / Table of Contents --- */
-  .toc-sidebar {
-    position: sticky;
-    top: 20px;
-    background: rgba(41, 151, 255, 0.1);
-    border: 1px solid rgba(41, 151, 255, 0.3);
-    padding: 15px;
-    border-radius: 12px;
+  header { text-align: center; margin-bottom: 50px; }
+  h1 { font-size: 3.2rem; font-weight: 800; margin: 0; letter-spacing: -0.04em; }
+  h2 { font-size: 1.8rem; color: #2997ff; margin-top: 2.5em; border-bottom: 1px solid #333; padding-bottom: 0.5em; }
+
+  /* Navigation Table of Contents */
+  .toc-nav {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 16px;
     margin-bottom: 40px;
   }
 
-  .toc-sidebar h3 {
-    margin: 0 0 10px 0;
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: #2997ff;
-  }
-
-  .toc-sidebar ul {
+  .toc-nav ul {
     list-style: none;
     padding: 0;
-    margin: 0;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
   }
 
-  .toc-sidebar a {
-    color: #f5f5f7;
-    text-decoration: none;
-    font-size: 0.9rem;
-    transition: color 0.2s;
-  }
-
-  .toc-sidebar a:hover {
+  .toc-nav a {
     color: #2997ff;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
   }
 
-  /* --- Typography --- */
-  h1 { font-size: 3rem; font-weight: 800; text-align: center; margin-bottom: 0; }
-  h2 { font-size: 1.8rem; color: #2997ff; margin-top: 2.5em; border-bottom: 1px solid #333; padding-bottom: 0.5em; }
-  h3 { font-size: 1.2rem; margin-top: 1.5em; }
-
-  p, li { line-height: 1.7; opacity: 0.9; }
+  .toc-nav a:hover { text-decoration: underline; }
 
   code { 
-    font-family: ui-monospace, SFMono-Regular, monospace; 
+    font-family: "SFMono-Regular", Consolas, monospace; 
     background: rgba(255,255,255,0.1); 
     padding: 0.2em 0.4em; 
-    border-radius: 4px; 
+    border-radius: 6px; 
     font-size: 0.9em;
   }
 
   .footer-legal {
-    margin-top: 80px;
+    margin-top: 100px;
     padding: 40px 0;
     border-top: 1px solid #333;
     text-align: center;
@@ -139,68 +130,60 @@
 <div class="content-overlay">
   <header>
     <h1>touchMORE</h1>
-    <p style="text-align: center; font-size: 1.2rem; opacity: 0.7;">High-level iPhone OS emulation fork.</p>
+    <p style="font-size: 1.25rem; opacity: 0.8; margin-top: 10px;">High-level iPhone OS emulation for modern systems.</p>
     
-    <div style="text-align: center; margin: 20px 0;">
-      <a href="https://touchmoredev.github.io/touchMORE/" style="color: #2997ff; text-decoration: none;">Website</a> &bull; 
-      <a href="https://appdb.touchhle.org/" style="color: #2997ff; text-decoration: none;">AppDB</a> &bull; 
-      <a href="https://github.com/touchMOREdev/touchMORE/releases" style="color: #2997ff; text-decoration: none;">GitHub</a>
+    <div style="margin-top: 25px;">
+      <a href="https://touchmoredev.github.io/touchMORE/" style="color: #2997ff; text-decoration: none; margin: 0 10px;">Website</a>
+      <a href="https://appdb.touchhle.org/" style="color: #2997ff; text-decoration: none; margin: 0 10px;">AppDB</a>
+      <a href="https://github.com/touchMOREdev/touchMORE/releases" style="color: #2997ff; text-decoration: none; margin: 0 10px;">GitHub</a>
     </div>
   </header>
 
-  <!-- Table of Contents -->
-  <nav class="toc-sidebar">
-    <h3>Documentation</h3>
+  <nav class="toc-nav">
     <ul>
-      <li><a href="#about">About Project</a></li>
-      <li><a href="#platforms">Platform Support</a></li>
-      <li><a href="#usage">Usage Guide</a></li>
-      <li><a href="#android">Android Notes</a></li>
-      <li><a href="#multiplayer">Multiplayer</a></li>
-      <li><a href="#licensing">Licensing</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#support">Support</a></li>
+      <li><a href="#usage">Usage</a></li>
+      <li><a href="#android">Android</a></li>
+      <li><a href="#license">License</a></li>
     </ul>
   </nav>
 
   <section id="about">
-    <h2>About</h2>
-    <p><strong>touchMORE</strong> is a high-level emulator for iPhone OS apps, forked from <code>touchHLE</code>. Written in <strong>Rust</strong>, it takes the place of iPhone OS itself, providing clean-room implementations of system frameworks like <code>UIKit</code>, <code>Foundation</code>, and <code>OpenGL ES</code>.</p>
+    <h2>Project Overview</h2>
+    <p><strong>touchMORE</strong> is a community-driven fork of <code>touchHLE</code>, focusing on high-level emulation (HLE) of early iPhone OS apps. Written in <strong>Rust</strong>, it allows you to run classic iOS games natively on modern desktop and mobile hardware.</p>
     <ul>
-      <li>Supports apps for iPhone OS 2.x and 3.0.</li>
-      <li>Working toward 64-bit iOS support.</li>
+      <li>Optimized for iPhone OS 2.x and 3.0.</li>
+      <li>Experimental work for 64-bit iOS support.</li>
     </ul>
   </section>
 
-  <section id="platforms">
+  <section id="support">
     <h2>Platform Support</h2>
-    <p>Officially supported with binary releases:</p>
+    <p>Binary releases are available for:</p>
     <ul>
-      <li><strong>Windows</strong> (x64)</li>
-      <li><strong>macOS</strong> (x64/Apple Silicon via Rosetta)</li>
-      <li><strong>Android</strong> (AArch64)</li>
+      <li><strong>Windows (x64)</strong></li>
+      <li><strong>macOS (x64 / Apple Silicon)</strong></li>
+      <li><strong>Android (AArch64)</strong></li>
     </ul>
   </section>
 
   <section id="usage">
     <h2>Usage</h2>
-    <p>Place your decrypted <code>.ipa</code> files or <code>.app</code> bundles in the <code>touchHLE_apps</code> directory. Use the built-in app picker to launch your games.</p>
+    <p>To run a game, place your decrypted <code>.ipa</code> or <code>.app</code> bundles in the <code>touchHLE_apps</code> folder. Launch the emulator and select your app from the picker.</p>
     <h3>Command Line</h3>
-    <code>.\touchHLE.exe "YourGame.ipa" --options</code>
+    <code>./touchHLE "Game.ipa" --allow-network-access</code>
   </section>
 
   <section id="android">
-    <h2>Special Android Notes</h2>
-    <p>Due to Scoped Storage, place files in:<br>
-    <code>/sdcard/Android/data/org.touchhle.android/files/touchHLE_apps</code></p>
+    <h2>Android Specifics</h2>
+    <p>Place your apps in the following directory:</p>
+    <code>/sdcard/Android/data/org.touchhle.android/files/touchHLE_apps</code>
   </section>
 
-  <section id="multiplayer">
-    <h2>Local Multiplayer</h2>
-    <p>Limited Wi-Fi multiplayer is supported in titles like <em>Asphalt 4</em> and <em>N.O.V.A.</em> Ensure <code>--allow-network-access</code> is enabled.</p>
-  </section>
-
-  <section id="licensing">
+  <section id="license">
     <h2>Licensing</h2>
-    <p>This is a community-driven fork. We do not claim copyright over the original project or Apple trademarks.</p>
+    <p>This is a community fork. We do not claim copyright over the original project or any trademarks held by Apple Inc.</p>
     <ul>
       <li>Source: Mozilla Public License 2.0</li>
       <li>Binaries: GNU GPL v3.0+</li>
@@ -208,8 +191,8 @@
   </section>
 
   <footer class="footer-legal">
-    <p>touchMORE is an independent open-source project. iPhone, iOS, and iPad are trademarks of Apple Inc.</p>
-    <p>JellyCar 1, 2, and 3 are included with the emulator.</p>
+    <p>touchMORE is an independent open-source project. Not affiliated with Apple Inc.</p>
+    <p>Includes JellyCar 1, 2, and 3.</p>
   </footer>
 </div>
 
